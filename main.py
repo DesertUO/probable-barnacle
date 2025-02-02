@@ -49,6 +49,8 @@ class Player(object):
         self.y = y
         self.game = game
 
+        self.kills = 0
+
     def update(self):
         if self.game.char == "d":
             self.x = self.x+1
@@ -118,13 +120,15 @@ class Game(object):
                 match entity.type:
                     case "monster":
                         self.entities.remove(entity)
+                        self.player.kills += 1
                     case _:
                         pass
 
     # Game renderer
     def render(self):
         # Misc
-        # print(self.title)
+        print("Welcome to " + self.title + "!")
+        print("Kills: " + str(self.player.kills))
         # print("Key pressed: ", self.char)
         # Print bottom side
         print(self.w*"_")
