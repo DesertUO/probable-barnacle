@@ -105,7 +105,7 @@ class Game(object):
         self.entities.append(entity_two)
 
         while (self.isRunning):
-            os.system("clear")
+            os.system("cls||clear")
             self.update()
             self.render()
             self.char = getchar()
