@@ -18,17 +18,25 @@ def getchar():
 
 
 class Entity(object):
-    def __init__(self, x: int, y: int, entityType: str,isInvincible: bool = False):
+    def __init__(self, Id: int, x: int, y: int, entityType: str = "",isInvincible: bool = False):
+        # Entity identifier
+        self.id = Id
+
+        # Entity position
         self.x = x
         self.y = y
+
+        # entity type
         self.type = entityType
 
+        # Entity character to print in the "sccreen" (terminal)
         match (self.type):
             case "monster":
                 self.char = "&"
             case _:
                 self.char = "?"
 
+        # Wether the entity is invincible
         self.isInvincible = isInvincible
 
     def update():
@@ -80,8 +88,8 @@ class Game(object):
     def run(self):
         self.isRunning = True
 
-        entity_one = Entity(4, 6, "monster")
-        entity_two = Entity(26, 10, "a")
+        entity_one = Entity(0, 4, 6, "monster")
+        entity_two = Entity(1, 26, 10)
         self.entities.append(entity_one)
         self.entities.append(entity_two)
 
@@ -94,14 +102,24 @@ class Game(object):
     # Game stopper/shutdown(er)
     def stop(self):
         self.isRunning = False
-        print("game successfully exited!")
+        print("Game successfully exited!")
         quit()
 
+    # So much nesting aaaaaaaa
     # Game updater
     def update(self):
         if self.char == "0":
             self.stop()
         self.player.update()
+
+        # Monster killing (WIP)
+        for entity in self.entities:
+            if self.player.x == entity.x and self.player.y == entity.y:
+                match entity.type:
+                    case "monster":
+                        self.entities.remove(entity)
+                    case _:
+                        pass
 
     # Game renderer
     def render(self):
