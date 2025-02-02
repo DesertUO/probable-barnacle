@@ -3,22 +3,31 @@ import os
 
 # Input check
 def getchar():
-   #Returns a single character from standard input
+    ch = ''
+    # Returns a single character from standard input
+    if os.name == 'nt':  # how it works on windows
+        import msvcrt
+        ch = msvcrt.getch()
+    else:
+        import tty
+        import termios
+        import sys
 
-    import tty, termios, sys
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    if ord(ch) == 3: exit()
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    if ord(ch) == 3:
+        exit()
     return ch
 
 
 class Entity(object):
-    def __init__(self, Id: int, x: int, y: int, entityType: str = "",isInvincible: bool = False):
+    def __init__(self, Id: int, x: int, y: int,
+                 entityType: str = "", isInvincible: bool = False):
         # Entity identifier
         self.id = Id
 
@@ -85,7 +94,7 @@ class Game(object):
 
         # self.entities = HashTable(889)
         self.entities = []
-    
+
     # Game runner/starter
     def run(self):
         self.isRunning = True
@@ -142,7 +151,8 @@ class Game(object):
                 for entity in self.entities:
                     # If curent cell has the position of an entity then do this
                     if col == entity.x and row == entity.y:
-                        if entity.x == self.player.x and entity.y == self.player.y:
+                        if ((entity.x == self.player.x) and
+                                (entity.y == self.player.y)):
                             print(entity.char, end="\b")
                         else:
                             print(entity.char, end="")
@@ -151,7 +161,8 @@ class Game(object):
                     print("x", end="")
                 # else
                 else:
-                    # We already check for player pos. here we check if current cell is a cell of any entity, and if not, then print " "
+                    # We already check for player pos. here we check if current
+                    # cell is a cell of any entity, and if not, then print " "
                     isOnTop = False
                     for entity in self.entities:
                         if col == entity.x and row == entity.y:
@@ -169,6 +180,7 @@ class Game(object):
 def main():
     game = Game("test game")
     game.run()
+
 
 # If this is the file executed
 if __name__ == '__main__':
