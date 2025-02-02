@@ -131,7 +131,10 @@ class Game(object):
         print("Kills: " + str(self.player.kills))
         # print("Key pressed: ", self.char)
         # Print bottom side
-        print(self.w*"_")
+        print()
+        print("Press '0' to quit")
+
+        print((self.w+2)*"_")
         for row in range(0, self.h):
             # Print left side
             print("|", end="")
@@ -158,7 +161,7 @@ class Game(object):
             # Print right side
             print("|\n", end="")
         # Print bottom side
-        print(self.w*"-", end="")
+        print((self.w+2)*"-", end="")
         print("\n", end="")
 
 
