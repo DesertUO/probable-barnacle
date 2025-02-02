@@ -1,6 +1,4 @@
-from utils import HashTable
 import os
-
 
 
 # Input check
@@ -96,9 +94,13 @@ class Game(object):
     # Game stopper/shutdown(er)
     def stop(self):
         self.isRunning = False
+        print("game successfully exited!")
+        quit()
 
     # Game updater
     def update(self):
+        if self.char == "0":
+            self.stop()
         self.player.update()
 
     # Game renderer
