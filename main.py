@@ -1,54 +1,6 @@
 import os
-
-
-# Input check
-def getchar():
-    ch = ''
-    # Returns a single character from standard input
-    # Windows version
-    # import msvcrt
-    # ch = msvcrt.getch()
-    # Linux version
-    import tty
-    import termios
-    import sys
-
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-
-    return ch
-
-
-class Entity(object):
-    def __init__(self, Id: int, x: int, y: int,
-                 entityType: str = "", isInvincible: bool = False):
-        # Entity identifier
-        self.id = Id
-
-        # Entity position
-        self.x = x
-        self.y = y
-
-        # entity type
-        self.type = entityType
-
-        # Entity character to print in the "sccreen" (terminal)
-        match (self.type):
-            case "monster":
-                self.char = "&"
-            case _:
-                self.char = "?"
-
-        # Wether the entity is invincible
-        self.isInvincible = isInvincible
-
-    def update():
-        ...
+from get_input import getchar
+from entity import Entity
 
 
 class Player(object):
@@ -81,18 +33,53 @@ class Player(object):
 
 # Game class
 class Game(object):
-    def __init__(self, title: str):
+    def __init__(self, title: str, defaultMap: str = "default_map.txt"):
         self.title = title
-        self.w = 40
-        self.h = 20
-
-        self.player = Player(0, 0, self)
 
         self.isRunning = False
         self.char = ''
 
         # self.entities = HashTable(889)
         self.entities = []
+
+        with open(defaultMap, "r") as file:
+            mapContent = file.read().split("\n")
+            mapReading = []
+            for line in mapContent:
+                if not line == "":
+                    if not line[0] == "#":
+                        if "WIDTH" == line.split(" ")[0]:
+                            self.w = int(line.split(" ")[1])
+                        elif "HEIGHT" == line.split(" ")[0]:
+                            self.h = int(line.split(" ")[1])
+                        else:
+                            mapReading.append(line)
+            newMap = []
+            for line in mapReading:
+                for el in line.split(" "):
+                    newMap.append(el)
+        self.map = newMap
+
+        self.player = Player(self.get_player_pos_in_map()[1],
+                             self.get_player_pos_in_map()[0], self)
+
+    def get_el_in_map(self, row: int, col: int) -> str:
+        if (col < 0 or col >= self.w) or (row < 0 or row >= self.h):
+            raise Exception("Invalid index for map: col:" +
+                            str(col) + ", row:" + str(row))
+
+        return self.map[(row * self.w) + col]
+
+    def get_player_pos_in_map(self) -> list:
+        row = 0
+        col = 0
+        for el in self.map:
+            if (col >= self.w):
+                col = 0
+                row += 1
+            if el == "P":
+                return [row, col]
+            col += 1
 
     # Game runner/starter
     def run(self):
@@ -167,12 +154,15 @@ class Game(object):
                         if col == entity.x and row == entity.y:
                             isOnTop = True
                     if not isOnTop:
-                        print(" ", end="")
+                        print(self.get_el_in_map(row, col), end="")
             # Print right side
             print("|\n", end="")
         # Print bottom side
         print((self.w+2)*"-", end="")
         print("\n", end="")
+
+    def get_map(self):
+        return self.map
 
 
 # Main function
