@@ -60,8 +60,14 @@ class Game(object):
                     newMap.append(el)
         self.map = newMap
 
-        self.player = Player(self.get_player_pos_in_map()[1],
-                             self.get_player_pos_in_map()[0], self)
+        if "P" in self.map:
+            self.player = Player(self.get_player_pos_in_map()[1],
+                                 self.get_player_pos_in_map()[0], self)
+            for i in range(0, self.w * self.h - 1):
+                if self.map[i] == "P":
+                    self.map[i] = "S"
+        else:
+            self.player = Player(0, 0, self)
 
     def get_el_in_map(self, row: int, col: int) -> str:
         if (col < 0 or col >= self.w) or (row < 0 or row >= self.h):
