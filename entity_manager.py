@@ -1,6 +1,3 @@
-from entity import Entity
-
-
 class EntityMannager(object):
     def __init__(self, game):
         self.entities = []
