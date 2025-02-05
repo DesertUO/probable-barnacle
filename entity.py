@@ -31,3 +31,7 @@ class Entity(object):
     @staticmethod
     def get_types() -> list:
         return list(Entity.types.keys())
+
+    @staticmethod
+    def get_type_chars() -> list:
+        return list(Entity.types.values())

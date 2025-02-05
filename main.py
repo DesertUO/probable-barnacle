@@ -1,6 +1,7 @@
 import os
 from get_input import getchar
 from entity import Entity
+from entity_manager import EntityMannager
 
 
 class Player(object):
@@ -39,9 +40,6 @@ class Game(object):
         self.isRunning = False
         self.char = ''
 
-        # self.entities = HashTable(889)
-        self.entities = []
-
         with open(defaultMap, "r") as file:
             mapContent = file.read().split("\n")
             mapReading = []
@@ -59,6 +57,10 @@ class Game(object):
                 for el in line.split(" "):
                     newMap.append(el)
         self.map = newMap
+
+        # self.entities = HashTable(889)
+        self.entityManager = EntityMannager(self)
+        self.entities = self.entityManager.get_entities()
 
         if "P" in self.map:
             self.player = Player(self.get_player_pos_in_map()[1],
@@ -90,11 +92,6 @@ class Game(object):
     # Game runner/starter
     def run(self):
         self.isRunning = True
-
-        entity_one = Entity(0, 4, 6, "monster")
-        entity_two = Entity(1, 26, 10)
-        self.entities.append(entity_one)
-        self.entities.append(entity_two)
 
         while (self.isRunning):
             os.system("cls||clear")
@@ -166,9 +163,6 @@ class Game(object):
         # Print bottom side
         print((self.w+2)*"-", end="")
         print("\n", end="")
-
-    def get_map(self):
-        return self.map
 
 
 # Main function
