@@ -1,9 +1,10 @@
 import os
 from get_input import getchar
-from entity import Entity
 from entity_manager import EntityMannager
+from config import Config
 
 
+# Player class
 class Player(object):
     def __init__(self, x: int, y: int, game: "Game"):
         self.x = x
@@ -12,7 +13,10 @@ class Player(object):
 
         self.kills = 0
 
+    # Updates player depending on the key pressed
+    # or whether the player is within boundries
     def update(self):
+        # Input checking
         if self.game.char == "d":
             self.x = self.x+1
         if self.game.char == "a":
@@ -22,6 +26,7 @@ class Player(object):
         if self.game.char == "s":
             self.y = self.y+1
 
+        # Boundry checking
         if self.x >= self.game.w:
             self.x = self.game.w-1
         if self.x < 0:
@@ -34,43 +39,58 @@ class Player(object):
 
 # Game class
 class Game(object):
-    def __init__(self, title: str, defaultMap: str = "default_map.txt"):
+    def __init__(self, title: str, defaultMap: str = "default_map.txt",
+                 defaultConfig: str = "config.txt"):
         self.title = title
 
         self.isRunning = False
         self.char = ''
 
+        self.defaultConfig = defaultConfig
+        self.config = Config(self)
+
+        self.charPairs = {"-": " ", "S": "S"}
+
+        # Reading the default map, defined in the player constructor
+        # (defaultMap)
         with open(defaultMap, "r") as file:
             mapContent = file.read().split("\n")
             mapReading = []
             for line in mapContent:
                 if not line == "":
-                    if not line[0] == "#":
-                        if "WIDTH" == line.split(" ")[0]:
-                            self.w = int(line.split(" ")[1])
-                        elif "HEIGHT" == line.split(" ")[0]:
-                            self.h = int(line.split(" ")[1])
-                        else:
-                            mapReading.append(line)
+                    # Checking if the line is a comment, prefixed by a "#"
+                    if line[0] == "#":
+                        continue
+                    if "WIDTH" == line.split(" ")[0]:
+                        self.w = int(line.split(" ")[1])
+                    elif "HEIGHT" == line.split(" ")[0]:
+                        self.h = int(line.split(" ")[1])
+                    else:
+                        mapReading.append(line)
             newMap = []
             for line in mapReading:
                 for el in line.split(" "):
                     newMap.append(el)
+
         self.map = newMap
 
         # self.entities = HashTable(889)
         self.entityManager = EntityMannager(self)
         self.entities = self.entityManager.get_entities()
 
+        # Setting a Player instance from the player position in the map
         if "P" in self.map:
             self.player = Player(self.get_player_pos_in_map()[1],
                                  self.get_player_pos_in_map()[0], self)
             for i in range(0, self.w * self.h - 1):
                 if self.map[i] == "P":
                     self.map[i] = "S"
+        # If player is not in the defaultMap then default it to (0, 0)
         else:
             self.player = Player(0, 0, self)
+            self.map[0] = "S"
 
+    # Function to get the element in given position (row, col)
     def get_el_in_map(self, row: int, col: int) -> str:
         if (col < 0 or col >= self.w) or (row < 0 or row >= self.h):
             raise Exception("Invalid index for map: col:" +
@@ -78,6 +98,7 @@ class Game(object):
 
         return self.map[(row * self.w) + col]
 
+    # Function to get the position of the player
     def get_player_pos_in_map(self) -> list:
         row = 0
         col = 0
@@ -132,10 +153,10 @@ class Game(object):
         print()
         print("Press '0' to quit")
 
-        print((self.w+2)*"_")
+        print(self.borderConfig[1] + self.w*self.borderConfig[2] + self.borderConfig[3])
         for row in range(0, self.h):
             # Print left side
-            print("|", end="")
+            print(self.borderConfig[0], end="")
             for col in range(0, self.w):
                 for entity in self.entities:
                     # If curent cell has the position of an entity then do this
@@ -157,12 +178,12 @@ class Game(object):
                         if col == entity.x and row == entity.y:
                             isOnTop = True
                     if not isOnTop:
-                        print(self.get_el_in_map(row, col), end="")
+                        print(self.charPairs.get(self.get_el_in_map(row, col)),
+                              end="")
             # Print right side
-            print("|\n", end="")
+            print(self.borderConfig[4] + "\n", end="")
         # Print bottom side
-        print((self.w+2)*"-", end="")
-        print("\n", end="")
+        print(self.borderConfig[7] + self.w*self.borderConfig[6] + self.borderConfig[5])
 
 
 # Main function

@@ -1,6 +1,7 @@
 entityTypes = {"monster": "&", "unknown": "?"}
 
 
+# Entity class
 class Entity(object):
     types = entityTypes
 
@@ -25,13 +26,18 @@ class Entity(object):
         # Wether the entity is invincible
         self.isInvincible = isInvincible
 
+    # Updates the entity
     def update(self):
         ...
 
+    # Static method that returns a list of entities types as strings of types
+    # names
     @staticmethod
     def get_types() -> list:
         return list(Entity.types.keys())
 
+    # Static method that returns a list of entities chars that are what to
+    # render in the terminal for each entity
     @staticmethod
     def get_type_chars() -> list:
         return list(Entity.types.values())

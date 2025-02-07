@@ -1,6 +1,7 @@
 from entity import Entity
 
 
+# EntityMannager class
 class EntityMannager(object):
     def __init__(self, game):
         self.entities = []
@@ -22,6 +23,8 @@ class EntityMannager(object):
             col += 1
             i += 1
 
+    # Function to get the entities in the form of a list containing instances
+    # of Entity
     def get_entities(self):
         entitiesT = []
         i = 0
@@ -30,12 +33,14 @@ class EntityMannager(object):
                 entityType[0] = "?"
 
             entity = Entity(i, entityType[1][0],
-                            entityType[1][1], str(list(Entity.get_types())[list(Entity.get_type_chars()).index(entityType[0])]))
+                            entityType[1][1],
+                            str(list(Entity.get_types())[list(Entity.get_type_chars()).index(entityType[0])]))
 
             entitiesT.append(entity)
             i += 1
         return entitiesT
 
+    # Supossedly updates each entity in the entity list
     def update(self):
         for entity in self.entities:
             entity.update()

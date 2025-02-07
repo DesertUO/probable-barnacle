@@ -1,0 +1,5 @@
+# CUSTOMIZATION
+
+BORDER:|,*,-,*,|,*,-,*
+# Order: leftBorder topLeftCorner topBorder topRightCorner rightBorder bottomRightCorner bottomBorder bottomLeftCorner
+# Just in case xdd
