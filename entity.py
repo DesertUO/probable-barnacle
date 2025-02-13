@@ -1,4 +1,4 @@
-entityTypes = {"monster": "&", "unknown": "?"}
+entityTypes = {"monster": "ξ", "bullet": "•", "unknown": "?"}
 
 
 # Entity class

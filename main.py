@@ -1,7 +1,14 @@
 import os
 from get_input import getchar
+from entity import Entity
 from entity_manager import EntityMannager
 from config import Config
+
+FacingIdle = 0
+FacingRight = 1
+FacingLeft = 2
+FacingUp = 3
+FacingDown = 4
 
 
 # Player class
@@ -13,18 +20,31 @@ class Player(object):
 
         self.kills = 0
 
+        self.hasFired = False
+
+        self.facing = FacingIdle
+
     # Updates player depending on the key pressed
     # or whether the player is within boundries
     def update(self):
         # Input checking
         if self.game.char == "d":
             self.x = self.x+1
+            self.facing = FacingRight
         if self.game.char == "a":
             self.x = self.x-1
+            self.facing = FacingLeft
         if self.game.char == "w":
             self.y = self.y-1
+            self.facing = FacingUp
         if self.game.char == "s":
             self.y = self.y+1
+            self.facing = FacingDown
+
+        if self.game.char == "f":
+            self.hasFired = True
+        else:
+            self.hasFired = False
 
         # Boundry checking
         if self.x >= self.game.w:
@@ -132,6 +152,10 @@ class Game(object):
         if self.char == "0":
             self.stop()
         self.player.update()
+        if self.player.hasFired:
+            self.entities.append(Entity(len(self.entities)+1, self.player.x + (self.player.facing == FacingRight) - (self.player.facing == FacingLeft), self.player.y - (self.player.facing == FacingUp) + (self.player.facing == FacingDown), "bullet"))
+            self.entities[len(self.entities)-1].bullet_step = 0
+            self.entities[len(self.entities)-1].bullet_dir = self.player.facing
 
         # Monster killing (WIP)
         for entity in self.entities:
@@ -142,6 +166,18 @@ class Game(object):
                         self.player.kills += 1
                     case _:
                         pass
+            if entity.type == "bullet":
+                for entity1 in self.entities:
+                    if entity1.type == "monster":
+                        if (entity.x == entity1.x) and (entity.y == entity1.y):
+                            self.entities.remove(entity)
+                            self.entities.remove(entity1)
+                entity.bullet_step += 1
+                if (entity.bullet_step == 10):
+                    self.entities.remove(entity)
+                else:
+                    entity.x += (entity.bullet_dir == 1) - (entity.bullet_dir == 2)
+                    entity.y += -(entity.bullet_dir == 3) + (entity.bullet_dir == 4)
 
     # Game renderer
     def render(self):
@@ -152,6 +188,7 @@ class Game(object):
         # Print bottom side
         print()
         print("Press '0' to quit")
+        print("Has the player fired a shot?:", self.player.hasFired)
 
         print(self.borderConfig[1] + self.w*self.borderConfig[2] + self.borderConfig[3])
         for row in range(0, self.h):
@@ -168,7 +205,19 @@ class Game(object):
                             print(entity.char, end="")
                 # If current cell has the position of the player then do this
                 if col == self.player.x and row == self.player.y:
-                    print("x", end="")
+                    match self.player.facing:
+                        case 0:
+                            print("x", end="")
+                        case 1:
+                            print(">", end="")
+                        case 2:
+                            print("<", end="")
+                        case 3:
+                            print("˄", end="")
+                        case 4:
+                            print("˅", end="")
+                        case _:
+                            print("x", end="")
                 # else
                 else:
                     # We already check for player pos. here we check if current

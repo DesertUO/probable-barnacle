@@ -44,3 +44,9 @@ class EntityMannager(object):
     def update(self):
         for entity in self.entities:
             entity.update()
+
+
+# Entity adder
+def add_entity(x: int, y: int, entityType: str, entityManager):
+    entities = entityManager.get_entities()
+    entities[3] = 345
