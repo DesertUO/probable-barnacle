@@ -2,6 +2,8 @@
 A simple python game made for the terminal.  
 Still in development
 
+Is step updated, not continuously updated, fps=actions per second??? something like that a
+
 ## Requirements
 - Having Python installed (3.x probably)
 
