@@ -1,61 +1,9 @@
 import os
+from utils import os_specific
 from get_input import getchar
 from entity import Entity
 from entity_manager import EntityMannager
 from config import Config
-
-FacingIdle = 0
-FacingRight = 1
-FacingLeft = 2
-FacingUp = 3
-FacingDown = 4
-
-
-# Player class
-class Player(object):
-    def __init__(self, x: int, y: int, game: "Game"):
-        self.x = x
-        self.y = y
-        self.game = game
-
-        self.kills = 0
-
-        self.hasFired = False
-
-        self.facing = FacingIdle
-
-    # Updates player depending on the key pressed
-    # or whether the player is within boundries
-    def update(self):
-        # Input checking
-        if self.game.char == "d":
-            self.x = self.x+1
-            self.facing = FacingRight
-        if self.game.char == "a":
-            self.x = self.x-1
-            self.facing = FacingLeft
-        if self.game.char == "w":
-            self.y = self.y-1
-            self.facing = FacingUp
-        if self.game.char == "s":
-            self.y = self.y+1
-            self.facing = FacingDown
-
-        if self.game.char == "f":
-            self.hasFired = True
-        else:
-            self.hasFired = False
-
-        # Boundry checking
-        if self.x >= self.game.w:
-            self.x = self.game.w-1
-        if self.x < 0:
-            self.x = 0
-        if self.y >= self.game.h:
-            self.y = self.game.h-1
-        if self.y < 0:
-            self.y = 0
-
 
 # Game class
 class Game(object):
@@ -67,6 +15,8 @@ class Game(object):
         self.char = ''
 
         self.defaultConfig = defaultConfig
+        # Default only if config fails (just for linter and intellisense anti-error method idk)
+        self.borderConfig = ["|","*","~","*","|","*","~","*"]
         self.config = Config(self)
 
         self.charPairs = {"-": " ", "S": "S"}
@@ -119,7 +69,7 @@ class Game(object):
         return self.map[(row * self.w) + col]
 
     # Function to get the position of the player
-    def get_player_pos_in_map(self) -> list:
+    def get_player_pos_in_map(self) -> list[int]:
         row = 0
         col = 0
         for el in self.map:
@@ -129,13 +79,14 @@ class Game(object):
             if el == "P":
                 return [row, col]
             col += 1
+        return [-1, -1]
 
     # Game runner/starter
     def run(self):
         self.isRunning = True
 
         while (self.isRunning):
-            os.system("cls||clear")
+            os_specific(lambda: os.system("cls"), lambda: os.system("clear"))
             self.update()
             self.render()
             self.char = getchar()
@@ -160,18 +111,16 @@ class Game(object):
         # Monster killing (WIP)
         for entity in self.entities:
             if self.player.x == entity.x and self.player.y == entity.y:
-                match entity.type:
+                match entity.get_type():
                     case "monster":
                         self.entities.remove(entity)
-                        self.player.kills += 1
-                    case _:
-                        pass
-            if entity.type == "bullet":
+            if entity.get_type() == "bullet":
                 for entity1 in self.entities:
                     if entity1.type == "monster":
                         if (entity.x == entity1.x) and (entity.y == entity1.y):
                             self.entities.remove(entity)
                             self.entities.remove(entity1)
+                            self.player.incrementKills()
                 entity.bullet_step += 1
                 if (entity.bullet_step == 10):
                     self.entities.remove(entity)
@@ -183,7 +132,7 @@ class Game(object):
     def render(self):
         # Misc
         print("Welcome to " + self.title + "!")
-        print("Kills: " + str(self.player.kills))
+        print("Kills: " + str(self.player.getKills()))
         # print("Key pressed: ", self.char)
         # Print bottom side
         print()

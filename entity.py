@@ -30,14 +30,17 @@ class Entity(object):
     def update(self):
         ...
 
+    def get_type(self) -> str:
+        return self.type
+
     # Static method that returns a list of entities types as strings of types
     # names
     @staticmethod
-    def get_types() -> list:
+    def get_types() -> list[str]:
         return list(Entity.types.keys())
 
     # Static method that returns a list of entities chars that are what to
     # render in the terminal for each entity
     @staticmethod
-    def get_type_chars() -> list:
+    def get_type_chars() -> list[str]:
         return list(Entity.types.values())
